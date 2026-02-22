@@ -70,7 +70,14 @@ class MyAddon(name: String) : DonationCoreAddon(name) {
         logger.info("MyAddon has been enabled!")
 
         // 글로벌 리스너 등록
-        DonationCore.manager.addGlobalListener(donationListener)
+        // manager는 수퍼 클래스에서 제공됩니다.
+        manager.addGlobalListener(donationListener)
+        
+        // 전역 리스너와 동일하게 각각의 플레이어마다 리스너를 등록할 수도 있습니다.
+        // Streamer는 도네이션이 들어오는 스트리머를 나타내는 객체입니다. GlobalEventListener.streamers에서 현재 등록된 모든 스트리머를 가져와서 각각에 리스너를 추가할 수 있습니다.
+        for ((name, streamer) in GlobalEventListener.streamers) {
+            streamer.addListener(donationListener)
+        }
     }
 
     override fun onDisable() {
