@@ -35,3 +35,51 @@ DonationCore는 Minecraft 서버용 Spigot/Bukkit 플러그인으로, 스트리�
 ## 지원 환경
 - Spigot/Bukkit/Paper(1.21.5 미만) 기반 Minecraft 서버
 - Java 17 이상 권장
+
+## 개발자 가이드 / Developer Guide
+- DonationCore는 손쉽게 애드온을 개발할 수 있도록 설계되었습니다.
+- 애드온 개발을 위해서는 Java 언어와 Spigot API에 대한 기본적인 이해가 필요합니다
+
+```kotlin
+package com.example.myaddon
+
+import io.github.jwyoon1220.donationCore.addon.api.DonationCoreAddon
+import io.github.jwyoon1220.donationCore.DonationCore
+import io.github.jwyoon1220.donationCore.stream.Streamer
+import io.github.jwyoon1220.donationCore.stream.Platform
+import io.github.jwyoon1220.donationCore.stream.DonationType
+import io.github.jwyoon1220.donationCore.addon.api.StreamListener
+
+// name은 꼭 있어야 합니다. 안그러면 NoSuchMethodException뜸
+class MyAddon(name: String) : DonationCoreAddon(name) {
+
+    private val donationListener = object : StreamListener {
+        override fun onDonation(
+            streamer: Streamer,
+            platform: Platform, // CHZZK or SOOP
+            type: DonationType, // NORMAL, MISSON 오타나서 저렇게 써야됨.
+            profile: Streamer.Donation // payAmount, name, message 등 도네이션 정보 담긴 객체 (왜 profile이냐고요? 저도 몰라요 귀찮아서 안바꿈)
+        ) {
+            // 도네이션 이벤트 처리 예시
+            logger.info("Received ${type.name} from ${profile.name} on ${platform.name}")
+        }
+    }
+
+    override fun onEnable() {
+        // 애드온 활성화 시 실행
+        logger.info("MyAddon has been enabled!")
+
+        // 글로벌 리스너 등록
+        DonationCore.manager.addGlobalListener(donationListener)
+    }
+
+    override fun onDisable() {
+        // 애드온 비활성화 시 실행
+        logger.info("MyAddon has been disabled!")
+
+        // 글로벌 리스너 제거
+        // 뭐... 굳이 안하셔도 됩니다. 어짜피 님들 Listner도 안하잖아요? JVM이 알아서 할?겁니다.
+        DonationCore.manager.removeGlobalListener(donationListener)
+    }
+}
+```
