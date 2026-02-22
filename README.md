@@ -85,7 +85,7 @@ class MyAddon(name: String) : DonationCoreAddon(name) {
         logger.info("MyAddon has been disabled!")
 
         // 글로벌 리스너 제거
-        // 뭐... 굳이 안하셔도 됩니다. 어짜피 님들 Listner도 안하잖아요? JVM이 알아서 할?겁니다.
+        // 뭐... 굳이 안하셔도 됩니다. 어짜피 님들 Listener도 안하잖아요? JVM이 알아서 할?겁니다.
         DonationCore.manager.removeGlobalListener(donationListener)
     }
 }
