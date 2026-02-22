@@ -1,0 +1,23 @@
+name: DonationCore
+version: '1.0-SNAPSHOT'
+main: io.github.jwyoon1220.donationCore.DonationCore
+api-version: '1.19'
+commands:
+  donationcore:
+    description: Main command for DonationCore plugin.
+    usage: /<command> <subcommand>
+    aliases: [dc]
+  donationtest:
+    description: Command to test the donation system.
+    usage: /<command> <player> <amount>
+    aliases:
+      - dt
+  jail:
+    description: Command to jail a player.
+    usage: /<command> <player> <duration>
+    aliases:
+      - 감옥
+  diamond:
+    description: Command to manage diamonds to submit for a player.
+    aliases:
+      - 다이아
