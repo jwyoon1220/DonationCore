@@ -16,7 +16,7 @@ DonationCore는 Minecraft 서버용 Spigot/Bukkit 플러그인으로, 스트리�
 - 런타임 중 애드온 로드 및 언로드 가능(구현중)
 
 3. **커맨드 지원**
-- 기본 도네이션 연결 및 테스트용 명령어 제공(`/dc SOOP/CHZZK BJID/ChnId)
+- 기본 도네이션 연결 및 테스트용 명령어 제공(`/dc SOOP/CHZZK BJID/ChnId`)
 - 서버 운영자가 도네이션 연동 상태 확인 가능(`/dt 플레이어 개수`)
 
 ## 설치 방법
