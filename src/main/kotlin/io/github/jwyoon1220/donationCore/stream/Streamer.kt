@@ -64,8 +64,8 @@ class Streamer(
             val payAmount = event?.message?.payAmount ?: 0
             val donation = Donation(
                 type = "CHZZK_DONATION",
-                nickname = event?.message?.profile?.nickname ?: "Unknown",
-                message = event?.message?.content ?: "Unknown",
+                nickname = event?.message?.profile?.nickname ?: "익명",
+                message = event?.message?.content ?: "메시지 없음",
                 payAmount = payAmount,
                 id = this.id
             )
