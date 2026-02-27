@@ -37,6 +37,7 @@ abstract class DonationCoreAddon(private val name: String) {
     abstract fun onDisable()
 
     fun reloadConfig() {
+        saveConfig()
         config = YamlConfiguration.loadConfiguration(configFile)
     }
 
@@ -45,7 +46,9 @@ abstract class DonationCoreAddon(private val name: String) {
     }
 
     fun saveDefaultConfig() {
-        configFile.parentFile.mkdirs()
-        configFile.createNewFile()
+        if (!configFile.exists()) {
+            configFile.parentFile.mkdirs()
+            configFile.createNewFile()
+        }
     }
 }

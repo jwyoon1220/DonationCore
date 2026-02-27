@@ -14,6 +14,7 @@ repositories {
         name = "papermc-repo"
     }
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -22,6 +23,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.github.R2turnTrue:chzzk4j:0.1.1")
     implementation("kr.zzik2:soop4j:0.0.3")
+    implementation("com.github.outstanding1301:donation-alert-api:1.0.0")
+    implementation("com.github.twitch4j:twitch4j:1.26.0")
     // Source: https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
 }
@@ -32,7 +35,7 @@ tasks {
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         jvmArgs("-XX:+UseZGC")
-        minecraftVersion("1.19.2")
+        minecraftVersion("1.21.4")
     }
 }
 

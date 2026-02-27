@@ -17,6 +17,12 @@ commands:
     usage: /<command> <addr> <value>
     aliases:
       - sc
+  reloadconfig:
+    description: Command to reload all configurations
+    usage: /<command>
+    aliases:
+      - rc
+      - rlcfg
   jail:
     description: Command to jail a player.
     usage: /<command> <player> <duration>
