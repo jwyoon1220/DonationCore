@@ -40,6 +40,8 @@ class AddonManager {
         return runAsync {
             if (!jarFile.exists() || !jarFile.name.endsWith(".jar")) return@runAsync
 
+            DonationCore.instance.logger.info("Loading Addon ${jarFile.name}...")
+
             try {
                 JarFile(jarFile).use { jar ->
                     val entry = jar.getJarEntry("addon.yml") ?: run {

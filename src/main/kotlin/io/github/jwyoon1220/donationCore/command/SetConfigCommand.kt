@@ -25,6 +25,7 @@ class SetConfigCommand(private val config: FileConfiguration): CommandExecutor {
             val addr = args[0]
             addon.config.set(addr, sender.inventory.itemInMainHand)
             sender.sendMessage("${name}: ${addr}=${sender.inventory.itemInMainHand.type}")
+            addon.saveConfig()
             return true
         }
         return true
