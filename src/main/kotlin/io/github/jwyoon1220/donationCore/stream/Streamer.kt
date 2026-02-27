@@ -16,6 +16,15 @@ import xyz.r2turntrue.chzzk4j.chat.ChzzkChat
 import xyz.r2turntrue.chzzk4j.chat.ChzzkChatBuilder
 import xyz.r2turntrue.chzzk4j.chat.event.MissionDonationEvent
 import xyz.r2turntrue.chzzk4j.chat.event.NormalDonationEvent
+import zzik2.soop4j.api.SoopChannel
+import zzik2.soop4j.chat.SoopChat
+import zzik2.soop4j.chat.SoopChatListener
+import zzik2.soop4j.chat.event.ConnectEvent
+import zzik2.soop4j.chat.event.DonationEvent
+import zzik2.soop4j.chat.event.EmoticonEvent
+import zzik2.soop4j.chat.event.NotificationEvent
+import zzik2.soop4j.model.channel.StationInfo
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 class Streamer(
@@ -25,16 +34,12 @@ class Streamer(
 ) {
 
     private lateinit var chzzkChat: ChzzkChat
+    private lateinit var soopChat: SoopChat
 
     private val listeners = ArrayList<StreamListener>()
-    private val client = OkHttpClient.Builder()
-        .pingInterval(20, TimeUnit.SECONDS)
-        .build()
-    private var ws: WebSocket? = null
-    private val gson = Gson()
+
 
     companion object {
-        const val SOOP_URL = "ws://streamer.biancaapi.com?platformId=afreeca&bjId="
         inline fun runMain(crossinline block: () -> Unit) {
             if (Bukkit.isPrimaryThread()) {
                 block()
@@ -64,8 +69,8 @@ class Streamer(
             val payAmount = event?.message?.payAmount ?: 0
             val donation = Donation(
                 type = "CHZZK_DONATION",
-                nickname = event?.message?.profile?.nickname ?: "Unknown",
-                message = event?.message?.content ?: "Unknown",
+                nickname = event?.message?.profile?.nickname ?: "익명",
+                message = event?.message?.content ?: "익명",
                 payAmount = payAmount,
                 id = this.id
             )
@@ -88,7 +93,8 @@ class Streamer(
             chzzkChat.connectAsync()
         } catch (e: Exception) {
             e.printStackTrace()
-            player.player?.sendTranslatedMessage("&c치지직 연결중 오류가 발생했습니다. 채널 ID를 확인해주세요.")
+            player.player?.sendTranslatedMessage("&c치지직 연결중 오류가 발생했습니다. (${e.javaClass.name}: ${e.message})")
+            player.player?.sendTranslatedMessage("&c StackTrace: ${e.stackTraceToString()}")
             return
         }
 
@@ -96,56 +102,47 @@ class Streamer(
     }
 
     private fun connectToSOOP() {
-        val request = Request.Builder().url(SOOP_URL + id).build()
-        ws = client.newWebSocket(request, object : WebSocketListener() {
+        soopChat = DonationCore.SOOP_CLIENT.chat(id)
+           .autoReconnect(true)
+           .reconnectDelayMs(5000)
+           .maxReconnectAttempts(5)
+           .build();
+        val stationInfo = DonationCore.SOOP_CLIENT.channel().station(id)
+        val name = stationInfo.station.stationName
 
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                runMain {
-                    player.player?.sendTranslatedMessage("&aSOOP에 연결되었습니다. &7(BJID: &e$id&7)")
-                }
+        soopChat.addListener(object : SoopChatListener {
+            override fun onConnect(event: ConnectEvent) {
+                player()?.sendTranslatedMessage("SOOP에 연결되었습니다. (Streamer ID: $id, name: $name")
             }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-               try {
-                   val donation = gson.fromJson(text, Donation::class.java)
-                   if (donation.type == "AFREECA_DONATION") {
-                       runMain {
-                           notifyDonation(
-                               platform = Platform.SOOP,
-                               type = DonationType.NORMAL,
-                               profile = donation,
-                           )
-                       }
-                   }
-               } catch (e: Exception) {
-                   e.printStackTrace()
-               }
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                t.printStackTrace()
-                runMain {
-                    player.player?.sendTranslatedMessage("SOOP에 연결중 오류가 발생했습니다. BJID가 올바른지 확인해주세요.")
-                }
+            override fun onDonation(event: DonationEvent) {
+                val donation = Donation(
+                    type = "SOOP_DONATION",
+                    nickname = event.fromUsername ?: "익명",
+                    message = "", // TODO: SOOP은 별풍선, 애드벌룬 이벤트에 메시지가 있지 않고 TTS가 이 이벤트 후 바로 오는 채팅 이벤트를 출력.
+                    payAmount = event.amount,
+                    id = this@Streamer.id
+                )
+                notifyDonation(Platform.SOOP, DonationType.NORMAL, donation)
             }
         })
+        try {
+            soopChat.connectAsync()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            player()?.sendTranslatedMessage("&cSOOP 연결중 오류가 발생했습니다. (${e.javaClass.name}: ${e.message})")
+            player()?.sendTranslatedMessage("&cStackTrace: ${e.stackTraceToString()}")
+        }
     }
 
     /** 후원 이벤트 전달 */
     fun notifyDonation(platform: Platform, type: DonationType, profile: Donation) {
-        val unit = when (platform) {
-            Platform.SOOP -> "별붕선"
-            Platform.CHZZK -> "치즈"
-        }
-        //player.player?.sendMessage("&a새로운 ${unit}이(가) 도착했습니다! (${profile.nickname}: &7${profile.payAmount}&a${unit}): &7${profile.nickname}: ${profile.message ?: ""}")
         listeners.forEach { it.onDonation(this, platform, type, profile) }
         DonationCore.manager.notifyGlobalListeners(this, platform, type, profile)
-        //player.player?.sendMessage("ntfy")
     }
 
     fun disconnect() {
         when (platform) {
-            Platform.SOOP -> ws?.close(1000, "Player disconnected")
+            Platform.SOOP -> soopChat.disconnect()
             Platform.CHZZK -> chzzkChat.closeAsync()
         }
     }
@@ -158,6 +155,10 @@ class Streamer(
         val id: String
     )
 
+    fun player(): Player? {
+        return player.player
+    }
+
     fun Player.sendActionBar(message: String) {
         this.spigot().sendMessage(
             ChatMessageType.ACTION_BAR,
@@ -166,5 +167,9 @@ class Streamer(
     }
     fun Player.sendTranslatedMessage(message: String) {
         this.sendMessage(ChatColor.translateAlternateColorCodes('&', message))
+        this.spigot().sendMessage(
+            ChatMessageType.ACTION_BAR,
+            TextComponent(ChatColor.translateAlternateColorCodes('&', message))
+        )
     }
 }

@@ -18,9 +18,10 @@ repositories {
 
 dependencies {
     // Source: https://mvnrepository.com/artifact/org.spigotmc/spigot-api
-    compileOnly("org.spigotmc:spigot:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.github.R2turnTrue:chzzk4j:0.1.1")
+    implementation("kr.zzik2:soop4j:0.0.3")
     // Source: https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
 }

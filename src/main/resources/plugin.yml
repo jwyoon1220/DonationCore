@@ -12,6 +12,11 @@ commands:
     usage: /<command> <player> <amount>
     aliases:
       - dt
+  setconfig:
+    description: Command to set configuration values.
+    usage: /<command> <addr> <value>
+    aliases:
+      - sc
   jail:
     description: Command to jail a player.
     usage: /<command> <player> <duration>
