@@ -7,6 +7,6 @@ import org.bukkit.OfflinePlayer
 
 interface StreamListener {
 
-    fun onDonation(streamer: Streamer, platform: Platform, type: DonationType, profile: Streamer.Donation)
+    fun onDonation(streamer: Streamer, platform: Platform, type: DonationType, profile: Streamer.Donation, rawAmt: Int)
 
 }

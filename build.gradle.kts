@@ -19,8 +19,8 @@ repositories {
 
 dependencies {
     // Source: https://mvnrepository.com/artifact/org.spigotmc/spigot-api
-    compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.github.R2turnTrue:chzzk4j:0.1.1")
     implementation("kr.zzik2:soop4j:0.0.3")
     implementation("com.github.outstanding1301:donation-alert-api:1.0.0")
@@ -39,7 +39,7 @@ tasks {
     }
 }
 
-val targetJavaVersion = 17
+val targetJavaVersion = 21
 kotlin {
     jvmToolchain(targetJavaVersion)
 }

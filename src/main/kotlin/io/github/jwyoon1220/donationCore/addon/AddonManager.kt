@@ -131,20 +131,18 @@ class AddonManager {
         }
     }
 
-    fun unloadAllAddons(): CompletableFuture<Void> {
-        return runAsync {
-            for ((name, loaded) in addons) {
-                try {
-                    runMain(loaded.addon::onDisable)
-                    loaded.classLoader.close()
-                    DonationCore.instance.logger.info("Addon unloaded: $name")
-                } catch (e: Exception) {
-                    DonationCore.instance.logger.severe("Error while unloading addon $name")
-                    e.printStackTrace()
-                }
+    fun unloadAllAddons() {
+        for ((name, loaded) in addons) {
+            try {
+                loaded.addon.onDisable()
+                loaded.classLoader.close()
+                DonationCore.instance.logger.info("Addon unloaded: $name")
+            } catch (e: Exception) {
+                DonationCore.instance.logger.severe("Error while unloading addon $name")
+                e.printStackTrace()
             }
-            addons.clear()
         }
+        addons.clear()
     }
 
     fun getAddon(name: String): DonationCoreAddon? =

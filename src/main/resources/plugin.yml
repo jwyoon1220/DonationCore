@@ -23,6 +23,11 @@ commands:
     aliases:
       - rc
       - rlcfg
+  debug:
+    description: Command to enable debug mode.
+    usage: /<command>
+    aliases:
+      - dbg
   jail:
     description: Command to jail a player.
     usage: /<command> <player> <duration>

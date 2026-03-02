@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import io.github.jwyoon1220.donationCore.DonationCore
 import io.github.jwyoon1220.donationCore.addon.api.StreamListener
+import io.github.jwyoon1220.donationCore.command.DebugModeCommand
 import jdk.internal.net.http.common.Log.channel
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.ChatMessageType
@@ -31,7 +32,7 @@ import java.util.logging.Logger
 class Streamer(
     val player: OfflinePlayer,
     private val id: String,
-    private val platform: Platform
+    val platform: Platform
 ) {
 
     private val logger = Logger.getLogger("Streamer(id: $id)")
@@ -75,10 +76,10 @@ class Streamer(
                 type = "CHZZK_DONATION",
                 nickname = event?.message?.profile?.nickname ?: "익명",
                 message = event?.message?.content ?: "익명",
-                payAmount = payAmount,
+                payAmount = payAmount / 100,
                 id = this.id
             )
-            notifyDonation(Platform.CHZZK, DonationType.NORMAL, donation)
+            notifyDonation(Platform.CHZZK, DonationType.NORMAL, donation, payAmount)
         }
         chzzkChat.on(MissionDonationEvent::class.java) { event ->
 
@@ -87,10 +88,10 @@ class Streamer(
                 type = "CHZZK_DONATION",
                 nickname = event?.message?.profile?.nickname ?: "Unknown",
                 message = event?.message?.content ?: "Unknown",
-                payAmount = payAmount,
+                payAmount = payAmount / 100,
                 id = this.id
             )
-            notifyDonation(Platform.CHZZK, DonationType.MISSON, donation)
+            notifyDonation(Platform.CHZZK, DonationType.MISSON, donation, payAmount)
         }
 
         try {
@@ -126,7 +127,7 @@ class Streamer(
                     payAmount = event.amount,
                     id = this@Streamer.id
                 )
-                notifyDonation(Platform.SOOP, DonationType.NORMAL, donation)
+                notifyDonation(Platform.SOOP, DonationType.NORMAL, donation, event.amount)
             }
         })
         try {
@@ -144,9 +145,11 @@ class Streamer(
     }
 
     /** 후원 이벤트 전달 */
-    fun notifyDonation(platform: Platform, type: DonationType, profile: Donation) {
-        listeners.forEach { it.onDonation(this, platform, type, profile) }
-        DonationCore.manager.notifyGlobalListeners(this, platform, type, profile)
+    fun notifyDonation(platform: Platform, type: DonationType, profile: Donation, rawAmt: Int) {
+
+        player()?.sendMessage("${profile.payAmount}")
+        listeners.forEach { it.onDonation(this, platform, type, profile, rawAmt) }
+        DonationCore.manager.notifyGlobalListeners(this, platform, type, profile, rawAmt)
     }
 
     fun disconnect() {
@@ -160,7 +163,7 @@ class Streamer(
         val type: String,
         val nickname: String,
         val message: String?,
-        val payAmount: Int,
+        var payAmount: Int,
         val id: String
     )
 

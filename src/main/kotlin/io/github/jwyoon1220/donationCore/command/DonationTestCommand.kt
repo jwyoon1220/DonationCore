@@ -41,16 +41,20 @@ class DonationTestCommand: CommandExecutor {
             sender.sendMessage("${ChatColor.RED}플레이어 '$nickname'은(는) 스트리머로 등록되어 있지 않습니다.")
             return true
         }
-
-        DonationCore.manager.notifyGlobalListeners(streamer, Platform.SOOP,
+        val id = when (streamer.platform) {
+            Platform.SOOP -> "SOOP_DONATION"
+            Platform.CHZZK -> "CHZZK_DONATION"
+        }
+        DonationCore.manager.notifyGlobalListeners(streamer, streamer.platform,
             DonationType.NORMAL, Streamer.Donation(
-                id = "AFREECA_DONATION",
+                id = id,
                 nickname = "테스트 기부자",
-                payAmount = amount,
+                payAmount = if (streamer.platform == Platform.CHZZK) amount / 100 else amount,
                 type = "NORMAL",
                 message = "테스트 기부 메시지"
-            ))
-        sender.sendMessage("${ChatColor.GREEN}테스트 기부 이벤트가 발생했습니다: $nickname -> $amount")
+            ), amount
+        )
+        sender.sendMessage("${ChatColor.GREEN}테스트 기부 이벤트가 발생했습니다: $id: $nickname -> raw: $amount, ${if (streamer.platform == Platform.CHZZK) amount / 100 else amount}")
         return true
     }
 }
