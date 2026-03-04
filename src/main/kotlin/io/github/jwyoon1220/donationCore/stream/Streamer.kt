@@ -146,8 +146,6 @@ class Streamer(
 
     /** 후원 이벤트 전달 */
     fun notifyDonation(platform: Platform, type: DonationType, profile: Donation, rawAmt: Int) {
-
-        player()?.sendMessage("${profile.payAmount}")
         listeners.forEach { it.onDonation(this, platform, type, profile, rawAmt) }
         DonationCore.manager.notifyGlobalListeners(this, platform, type, profile, rawAmt)
     }

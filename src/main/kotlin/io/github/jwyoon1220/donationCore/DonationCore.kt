@@ -4,6 +4,7 @@ import io.github.jwyoon1220.donationCore.addon.AddonManager
 import io.github.jwyoon1220.donationCore.command.ConnectCommand
 import io.github.jwyoon1220.donationCore.command.DebugModeCommand
 import io.github.jwyoon1220.donationCore.command.DonationTestCommand
+import io.github.jwyoon1220.donationCore.command.GetItemCommand
 import io.github.jwyoon1220.donationCore.command.ReloadAllConfigCommand
 import io.github.jwyoon1220.donationCore.command.SetConfigCommand
 import io.github.jwyoon1220.donationCore.stream.DonationManager
@@ -33,6 +34,12 @@ class DonationCore : JavaPlugin() {
         getCommand("setconfig")?.setExecutor(SetConfigCommand(config))
         getCommand("reloadconfig")?.setExecutor(ReloadAllConfigCommand())
         getCommand("debug")?.setExecutor(DebugModeCommand)
+        GetItemCommand().apply {
+            getCommand("getitem")?.let {
+                it.setExecutor(this)
+                it.tabCompleter = this
+            }
+        }
         saveDefaultConfig()
 
         addonManager.loadAddons()

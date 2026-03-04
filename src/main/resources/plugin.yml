@@ -28,12 +28,15 @@ commands:
     usage: /<command>
     aliases:
       - dbg
+  getitem:
+    description: Command to get item setted in addon's config
   jail:
     description: Command to jail a player.
     usage: /<command> <player> <duration>
     aliases:
       - 감옥
-  diamond:
-    description: Command to manage diamonds to submit for a player.
+  coal:
+    description: Command to open submit coal gui to player
+    usage: /<command> <player>
     aliases:
-      - 다이아
+      - 석탄
